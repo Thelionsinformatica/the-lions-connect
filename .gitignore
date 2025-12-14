@@ -1,0 +1,33 @@
+# Arquivos de configuração sensíveis
+*.key
+*.pem
+*_rsa
+*_rsa.pub
+config.json
+clients_db.json
+
+# Arquivos temporários
+*.tmp
+*.log
+*.swp
+*.swo
+*~
+
+# Diretórios de sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos de IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
