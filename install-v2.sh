@@ -18,9 +18,12 @@ NC='\033[0m' # No Color
 # Configurações
 CONFIG_DIR="/opt/the-lions-connect"
 WG_CONFIG_FILE="/etc/wireguard/the-lions.conf"
-SERVER_ENDPOINT="thelions.redirectme.net:13231"
+SERVER_PUBLIC_IP="190.15.98.231"
+SERVER_LOCAL_IP="172.31.1.1"
+SERVER_PORT="13231"
 SERVER_PUBLIC_KEY="2DN8lgjtjUaR+xQ4pmKySGZoii0QdYOJ8Pa5QaS4iBU="
 VPN_NETWORK="10.99.0.0/24"
+LOCAL_NETWORK="172.31.1.0/24"
 
 echo -e "${BLUE}"
 echo "═══════════════════════════════════════════════════════════════"
@@ -91,6 +94,18 @@ chmod 600 "$CONFIG_DIR/private.key"
 
 echo -e "${GREEN}[+]${NC} Chaves geradas com sucesso"
 
+# Detectar se está na mesma rede local que o servidor
+echo -e "${BLUE}[*]${NC} Detectando endpoint do servidor..."
+LOCAL_IP=$(hostname -I | awk '{print $1}')
+
+if [[ "$LOCAL_IP" =~ ^172\.31\.1\. ]]; then
+    SERVER_ENDPOINT="${SERVER_LOCAL_IP}:${SERVER_PORT}"
+    echo -e "${GREEN}[+]${NC} Detectada rede local - usando endpoint: $SERVER_ENDPOINT"
+else
+    SERVER_ENDPOINT="${SERVER_PUBLIC_IP}:${SERVER_PORT}"
+    echo -e "${GREEN}[+]${NC} Rede externa - usando endpoint: $SERVER_ENDPOINT"
+fi
+
 # Salvar informações do dispositivo
 cat > "$CONFIG_DIR/device-info.json" <<EOF
 {
@@ -98,6 +113,8 @@ cat > "$CONFIG_DIR/device-info.json" <<EOF
   "hostname": "$(hostname)",
   "os": "$PRETTY_NAME",
   "public_key": "$PUBLIC_KEY",
+  "local_ip": "$LOCAL_IP",
+  "server_endpoint": "$SERVER_ENDPOINT",
   "install_date": "$(date -Iseconds)",
   "version": "2.0"
 }
