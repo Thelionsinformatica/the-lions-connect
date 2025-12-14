@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Manus Connect - Client Management System
+The Lions Connect - Client Management System
 Gerencia a aprovação de novos clientes e suas chaves SSH no servidor central.
 """
 
@@ -17,7 +17,7 @@ MIKROTIK_USER = os.getenv("MIKROTIK_USER", "jarvis")
 MIKROTIK_PASSWORD = os.getenv("MIKROTIK_PASSWORD", "Andre@311407")
 
 # Arquivo de banco de dados de clientes
-CLIENTS_DB = "/opt/manus-connect/clients_db.json"
+CLIENTS_DB = "/opt/the-lions-connect/clients_db.json"
 
 def load_clients_db():
     """Carrega o banco de dados de clientes."""

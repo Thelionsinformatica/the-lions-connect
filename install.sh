@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Manus Connect - The Lions Group Network
+# The Lions Connect - The Lions Group Network
 # "Tem Internet? Já Era!" - Acesso Remoto Automático
 #
 # Uso: curl -fsSL connect.thelions.net/install | bash
@@ -71,8 +71,8 @@ fi
 log_success "Dependências OK"
 
 # Criar diretório
-mkdir -p /opt/manus-connect
-cd /opt/manus-connect
+mkdir -p /opt/the-lions-connect
+cd /opt/the-lions-connect
 
 # Gerar chave SSH
 if [ ! -f /root/.ssh/id_manus ]; then
@@ -99,7 +99,7 @@ EOF
 # Script de conexão
 cat > connect.sh << 'CONNECT_EOF'
 #!/bin/bash
-CONFIG="/opt/manus-connect/config.json"
+CONFIG="/opt/the-lions-connect/config.json"
 DEVICE_ID=$(grep -o '"device_id": "[^"]*' $CONFIG | cut -d'"' -f4)
 REMOTE_PORT=$((10000 + $(echo -n "$DEVICE_ID" | md5sum | cut -c1-4 | tr 'a-f' '0-5' | sed 's/^0*//' | head -c4)))
 
@@ -117,15 +117,15 @@ CONNECT_EOF
 chmod +x connect.sh
 
 # Serviço systemd
-cat > /etc/systemd/system/manus-connect.service << 'SERVICE_EOF'
+cat > /etc/systemd/system/the-lions-connect.service << 'SERVICE_EOF'
 [Unit]
-Description=Manus Connect - The Lions Group Network
+Description=The Lions Connect - The Lions Group Network
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/opt/manus-connect/connect.sh
+ExecStart=/opt/the-lions-connect/connect.sh
 Restart=always
 RestartSec=10
 User=root
@@ -135,7 +135,7 @@ WantedBy=multi-user.target
 SERVICE_EOF
 
 systemctl daemon-reload
-systemctl enable manus-connect.service > /dev/null 2>&1
+systemctl enable the-lions-connect.service > /dev/null 2>&1
 log_success "Serviço configurado"
 
 # Resultado
@@ -149,7 +149,7 @@ echo ""
 echo -e "${YELLOW}${BOLD}⚠️  PRÓXIMOS PASSOS:${NC}"
 echo -e "   1. Envie o ID acima para o administrador"
 echo -e "   2. Aguarde aprovação"
-echo -e "   3. Inicie: ${BOLD}systemctl start manus-connect${NC}"
+echo -e "   3. Inicie: ${BOLD}systemctl start the-lions-connect${NC}"
 echo ""
 echo -e "${CYAN}📄 Chave SSH:${NC}"
 echo -e "${BLUE}$SSH_PUBKEY${NC}"

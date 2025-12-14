@@ -1,20 +1,20 @@
 
 # 🔧 **Solução de Problemas (Troubleshooting)**
 
-Se você está enfrentando problemas com o Manus Connect, este guia pode ajudar a diagnosticar e resolver as questões mais comuns.
+Se você está enfrentando problemas com o The Lions Connect, este guia pode ajudar a diagnosticar e resolver as questões mais comuns.
 
 ---
 
-### **Problema 1: O serviço `manus-connect` não inicia ou falha imediatamente.**
+### **Problema 1: O serviço `the-lions-connect` não inicia ou falha imediatamente.**
 
 Primeiro, verifique o status e os logs do serviço.
 
 ```bash
 # Verificar o status
-systemctl status manus-connect
+systemctl status the-lions-connect
 
 # Ver os logs detalhados
-journalctl -u manus-connect -n 50 --no-pager
+journalctl -u the-lions-connect -n 50 --no-pager
 ```
 
 #### **Causa Comum 1: Chave SSH não autorizada**
@@ -37,11 +37,11 @@ Se os logs mostrarem um erro de `Connection timed out` ou `Network is unreachabl
 
 #### **Causa Comum 3: Arquivos de configuração corrompidos**
 
-Se os logs mostrarem erros relacionados a arquivos não encontrados ou com formato inválido dentro de `/opt/manus-connect`.
+Se os logs mostrarem erros relacionados a arquivos não encontrados ou com formato inválido dentro de `/opt/the-lions-connect`.
 
-- **Solução**: A maneira mais fácil de corrigir isso é reinstalar o Manus Connect. Primeiro, execute o script de desinstalação e, em seguida, execute o comando de instalação novamente.
+- **Solução**: A maneira mais fácil de corrigir isso é reinstalar o The Lions Connect. Primeiro, execute o script de desinstalação e, em seguida, execute o comando de instalação novamente.
   ```bash
-  /opt/manus-connect/uninstall.sh
+  /opt/the-lions-connect/uninstall.sh
   curl -fsSL https://connect.thelions.net/install | bash
   ```
   > **Lembre-se**: A reinstalação gerará um novo ID e uma nova chave SSH. Você precisará enviar as novas informações ao administrador novamente.
@@ -56,7 +56,7 @@ Isso geralmente indica que o túnel foi estabelecido, mas há um problema no lad
 
 O administrador pode estar tentando se conectar à porta errada.
 
-- **Solução**: Verifique o ID do seu dispositivo (no arquivo `/opt/manus-connect/config.json`) e peça ao administrador para confirmar qual porta dinâmica foi calculada para esse ID.
+- **Solução**: Verifique o ID do seu dispositivo (no arquivo `/opt/the-lions-connect/config.json`) e peça ao administrador para confirmar qual porta dinâmica foi calculada para esse ID.
 
 #### **Causa Comum 2: Firewall no Servidor Central**
 
@@ -82,9 +82,9 @@ O serviço foi projetado para se reconectar, mas quedas frequentes podem indicar
 
 Se você não conseguir resolver o problema, colete as seguintes informações antes de pedir ajuda ao administrador:
 
-1.  A saída do comando `systemctl status manus-connect`.
-2.  As últimas 50 linhas dos logs: `journalctl -u manus-connect -n 50 --no-pager`.
-3.  O conteúdo do arquivo de configuração: `cat /opt/manus-connect/config.json`.
+1.  A saída do comando `systemctl status the-lions-connect`.
+2.  As últimas 50 linhas dos logs: `journalctl -u the-lions-connect -n 50 --no-pager`.
+3.  O conteúdo do arquivo de configuração: `cat /opt/the-lions-connect/config.json`.
 4.  O resultado do teste de conectividade: `nc -zv thelions.redirectme.net 2220`.
 
 Fornecer essas informações ajudará a diagnosticar o problema muito mais rapidamente.

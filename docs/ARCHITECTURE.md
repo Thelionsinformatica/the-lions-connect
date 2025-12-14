@@ -1,9 +1,9 @@
 '''
-# 🏛️ **Arquitetura do Manus Connect**
+# 🏛️ **Arquitetura do The Lions Connect**
 
 ## **Visão Geral**
 
-O Manus Connect foi projetado para ser um sistema de acesso remoto **simples, seguro e resiliente**. A arquitetura se baseia no conceito de **túnel reverso SSH**, onde a conexão é sempre iniciada pelo cliente (servidor a ser acessado) em direção a um ponto central (servidor de salto), eliminando a necessidade de abrir portas de entrada no firewall do cliente.
+O The Lions Connect foi projetado para ser um sistema de acesso remoto **simples, seguro e resiliente**. A arquitetura se baseia no conceito de **túnel reverso SSH**, onde a conexão é sempre iniciada pelo cliente (servidor a ser acessado) em direção a um ponto central (servidor de salto), eliminando a necessidade de abrir portas de entrada no firewall do cliente.
 
 Isso o torna ideal para ambientes com restrições de rede, como NAT, CGNAT ou firewalls corporativos, seguindo o princípio "se tem internet, conecta".
 
@@ -14,7 +14,7 @@ Isso o torna ideal para ambientes com restrições de rede, como NAT, CGNAT ou f
 ```mermaid
 graph TD
     subgraph Cliente (Servidor Remoto)
-        A[Serviço Systemd: manus-connect.service] --> B{Script: connect.sh};
+        A[Serviço Systemd: the-lions-connect.service] --> B{Script: connect.sh};
         B --> C{Comando SSH};
     end
 
@@ -35,7 +35,7 @@ graph TD
 
 1.  **Cliente (Servidor a ser Acessado)**:
     *   **`install.sh`**: Script de instalação que configura o ambiente, gera chaves SSH e cria o serviço.
-    *   **`manus-connect.service`**: Um serviço `systemd` que garante que a conexão seja persistente e reinicie automaticamente em caso de falha ou após o boot do sistema.
+    *   **`the-lions-connect.service`**: Um serviço `systemd` que garante que a conexão seja persistente e reinicie automaticamente em caso de falha ou após o boot do sistema.
     *   **`connect.sh`**: O script principal que executa o comando `ssh` para estabelecer o túnel reverso.
     *   **Chave SSH (`/root/.ssh/id_manus`)**: Chave dedicada para autenticação segura e sem senha com o servidor central.
 
@@ -55,7 +55,7 @@ graph TD
 1.  **Instalação**: O usuário executa o `install.sh` no servidor cliente.
 2.  **Geração de ID**: O script gera um ID único para o dispositivo (ex: `tlg-a1b2c3d4`) e uma chave SSH.
 3.  **Cálculo da Porta**: Uma porta remota dinâmica (entre 10000 e 65535) é calculada deterministicamente a partir do ID do dispositivo. Isso garante que cada cliente tenha sua própria porta de acesso, sem colisões.
-4.  **Início do Serviço**: O serviço `manus-connect.service` é iniciado.
+4.  **Início do Serviço**: O serviço `the-lions-connect.service` é iniciado.
 5.  **Estabelecimento do Túnel**: O `connect.sh` executa o comando `ssh` para conectar ao Servidor Central (MikroTik) e solicita um túnel reverso:
     ```bash
     ssh -R <porta_dinamica>:localhost:22 jarvis@thelions.redirectme.net -p 2220

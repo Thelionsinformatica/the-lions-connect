@@ -1,6 +1,6 @@
-# 🦁 Manus Connect
+# 🦁 **THE LIONS CONNECT v1.0**
 
-**Sistema plug-and-play para conectar servidores à Rede The Lions Group**
+**Sistema plug-and-play de acesso remoto - Funciona através de qualquer firewall/NAT**
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/status-active-success.svg)]()
@@ -9,7 +9,7 @@
 
 ## 📋 **O que é?**
 
-**Manus Connect** é um sistema de conexão automática que permite integrar qualquer servidor Linux à **Rede The Lions Group** de forma simples e segura, similar ao ZeroTier.
+**The Lions Connect** é um sistema de conexão automática que permite integrar qualquer servidor Linux à **Rede The Lions Group** de forma simples e segura, similar ao ZeroTier.
 
 Com apenas **um comando**, seu servidor:
 - ✅ Conecta automaticamente à rede central
@@ -25,7 +25,7 @@ Com apenas **um comando**, seu servidor:
 ### **No servidor que deseja conectar:**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Thelionsinformatica/manus-connect/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Thelionsinformatica/the-lions-connect/main/install.sh | bash
 ```
 
 **Ou usando a URL curta (em breve):**
@@ -105,32 +105,32 @@ curl -fsSL connect.thelions.net | bash
 
 ### **Ver status da conexão:**
 ```bash
-systemctl status manus-connect
+systemctl status the-lions-connect
 ```
 
 ### **Parar conexão:**
 ```bash
-systemctl stop manus-connect
+systemctl stop the-lions-connect
 ```
 
 ### **Iniciar conexão:**
 ```bash
-systemctl start manus-connect
+systemctl start the-lions-connect
 ```
 
 ### **Reiniciar conexão:**
 ```bash
-systemctl restart manus-connect
+systemctl restart the-lions-connect
 ```
 
 ### **Ver logs:**
 ```bash
-journalctl -u manus-connect -f
+journalctl -u the-lions-connect -f
 ```
 
 ### **Desinstalar:**
 ```bash
-/opt/manus-connect/uninstall.sh
+/opt/the-lions-connect/uninstall.sh
 ```
 
 ---
@@ -147,7 +147,7 @@ journalctl -u manus-connect -f
 ## 🛠️ **Arquitetura**
 
 ```
-manus-connect/
+the-lions-connect/
 ├── install.sh              # Script de instalação principal
 ├── manus-agent.py          # Agente de gerenciamento
 ├── config/
@@ -165,7 +165,7 @@ manus-connect/
 
 ## 🤝 **Suporte**
 
-- **Issues:** [GitHub Issues](https://github.com/Thelionsinformatica/manus-connect/issues)
+- **Issues:** [GitHub Issues](https://github.com/Thelionsinformatica/the-lions-connect/issues)
 - **Email:** suporte@thelions.com.br
 - **Website:** https://thelions.com.br
 

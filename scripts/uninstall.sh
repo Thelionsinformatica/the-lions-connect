@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Manus Connect - Uninstaller
+# The Lions Connect - Uninstaller
 #
 
 set -e
@@ -32,28 +32,28 @@ echo -e "${NC}"
 # Verificar root
 [ "$EUID" -ne 0 ] && { log_error "Execute como root"; exit 1; }
 
-log_info "Parando e desabilitando o serviço manus-connect..."
-systemctl stop manus-connect.service > /dev/null 2>&1 || true
-systemctl disable manus-connect.service > /dev/null 2>&1 || true
+log_info "Parando e desabilitando o serviço the-lions-connect..."
+systemctl stop the-lions-connect.service > /dev/null 2>&1 || true
+systemctl disable the-lions-connect.service > /dev/null 2>&1 || true
 log_success "Serviço parado e desabilitado."
 
 log_info "Removendo arquivos do sistema..."
-rm -f /etc/systemd/system/manus-connect.service
+rm -f /etc/systemd/system/the-lions-connect.service
 systemctl daemon-reload
 log_success "Arquivo de serviço removido."
 
 log_info "Removendo diretório de instalação..."
-rm -rf /opt/manus-connect
-log_success "Diretório /opt/manus-connect removido."
+rm -rf /opt/the-lions-connect
+log_success "Diretório /opt/the-lions-connect removido."
 
 log_info "Removendo chave SSH..."
 rm -f /root/.ssh/id_manus
 rm -f /root/.ssh/id_manus.pub
-log_success "Chave SSH do Manus Connect removida."
+log_success "Chave SSH do The Lions Connect removida."
 
 echo ""
 echo -e "${GREEN}${BOLD}╔═══════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${GREEN}${BOLD}║           ✅  DESINSTALAÇÃO CONCLUÍDA!  ✅                  ║${NC}"
 echo -e "${GREEN}${BOLD}╚═══════════════════════════════════════════════════════════════╝${NC}"
 echo ""
-log_info "Obrigado por usar o Manus Connect!"
+log_info "Obrigado por usar o The Lions Connect!"

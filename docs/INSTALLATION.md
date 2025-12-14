@@ -1,7 +1,7 @@
 '''
-# 🚀 **Guia de Instalação do Manus Connect**
+# 🚀 **Guia de Instalação do The Lions Connect**
 
-Este guia detalha o processo de instalação, configuração e uso do Manus Connect para integrar seu servidor à Rede The Lions Group.
+Este guia detalha o processo de instalação, configuração e uso do The Lions Connect para integrar seu servidor à Rede The Lions Group.
 
 ---
 
@@ -18,7 +18,7 @@ Antes de começar, garanta que seu sistema atende aos seguintes requisitos:
 
 ## ⚡ **Instalação com Um Comando**
 
-A forma mais simples e recomendada de instalar o Manus Connect é através do nosso script de instalação automatizado.
+A forma mais simples e recomendada de instalar o The Lions Connect é através do nosso script de instalação automatizado.
 
 Abra o terminal no servidor que você deseja conectar e execute o seguinte comando:
 
@@ -33,7 +33,7 @@ O script fará o seguinte automaticamente:
 2.  Instalará as dependências necessárias (`openssh-client`, `curl`).
 3.  Gerará uma chave SSH única para o dispositivo em `/root/.ssh/id_manus`.
 4.  Criará um ID de dispositivo único (ex: `tlg-a1b2c3d4`).
-5.  Configurará o serviço `systemd` (`manus-connect.service`) para garantir a persistência da conexão.
+5.  Configurará o serviço `systemd` (`the-lions-connect.service`) para garantir a persistência da conexão.
 6.  Exibirá o **ID do Dispositivo** e a **chave pública SSH**.
 
 ---
@@ -58,7 +58,7 @@ O administrador precisa adicionar sua chave pública à lista de chaves autoriza
 Assim que o administrador confirmar que sua chave foi autorizada, você pode iniciar o serviço de conexão com o seguinte comando:
 
 ```bash
-systemctl start manus-connect
+systemctl start the-lions-connect
 ```
 
 **Pronto!** Seu servidor agora está conectado de forma segura à Rede The Lions Group.
@@ -70,20 +70,20 @@ systemctl start manus-connect
 Para verificar se o serviço está rodando corretamente, use o comando:
 
 ```bash
-systemctl status manus-connect
+systemctl status the-lions-connect
 ```
 
 Uma saída bem-sucedida se parecerá com isto:
 
 ```
-● manus-connect.service - Manus Connect - The Lions Group Network
-     Loaded: loaded (/etc/systemd/system/manus-connect.service; enabled; vendor preset: enabled)
+● the-lions-connect.service - The Lions Connect - The Lions Group Network
+     Loaded: loaded (/etc/systemd/system/the-lions-connect.service; enabled; vendor preset: enabled)
      Active: active (running) since Sun 2025-12-14 14:30:00 UTC; 10min ago
    Main PID: 12345 (connect.sh)
       Tasks: 2 (limit: 4662)
      Memory: 1.2M
-     CGroup: /system.slice/manus-connect.service
-             ├─12345 /bin/bash /opt/manus-connect/connect.sh
+     CGroup: /system.slice/the-lions-connect.service
+             ├─12345 /bin/bash /opt/the-lions-connect/connect.sh
              └─12346 ssh -i /root/.ssh/id_manus -o StrictHostKeyChecking=no ...
 ```
 
@@ -93,17 +93,17 @@ Se o status for `active (running)`, a conexão está funcionando.
 
 ## 🗑️ **Desinstalação**
 
-Se você precisar remover o Manus Connect do seu servidor, fornecemos um script de desinstalação simples.
+Se você precisar remover o The Lions Connect do seu servidor, fornecemos um script de desinstalação simples.
 
 Execute o seguinte comando como `root`:
 
 ```bash
-/opt/manus-connect/uninstall.sh
+/opt/the-lions-connect/uninstall.sh
 ```
 
 O script irá:
-- Parar e desabilitar o serviço `manus-connect`.
-- Remover todos os arquivos de configuração e scripts de `/opt/manus-connect`.
+- Parar e desabilitar o serviço `the-lions-connect`.
+- Remover todos os arquivos de configuração e scripts de `/opt/the-lions-connect`.
 - Remover o arquivo de serviço de `/etc/systemd/system`.
 - Remover as chaves SSH geradas (`id_manus` e `id_manus.pub`).
 
