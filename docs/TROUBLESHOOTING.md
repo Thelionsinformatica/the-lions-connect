@@ -1,90 +1,314 @@
+# 🔧 THE LIONS CONNECT v2.0 - Troubleshooting
 
-# 🔧 **Solução de Problemas (Troubleshooting)**
-
-Se você está enfrentando problemas com o The Lions Connect, este guia pode ajudar a diagnosticar e resolver as questões mais comuns.
+Guia completo de resolução de problemas do THE LIONS CONNECT.
 
 ---
 
-### **Problema 1: O serviço `the-lions-connect` não inicia ou falha imediatamente.**
+## 📋 **Índice**
 
-Primeiro, verifique o status e os logs do serviço.
+1. [Problemas de Conectividade](#problemas-de-conectividade)
+2. [Problemas de Handshake](#problemas-de-handshake)
+3. [Problemas de Firewall](#problemas-de-firewall)
+4. [Problemas de DNS](#problemas-de-dns)
+5. [Problemas de Instalação](#problemas-de-instalação)
+6. [Diagnóstico Geral](#diagnóstico-geral)
+
+---
+
+## 🔌 **Problemas de Conectividade**
+
+### **Sintoma: Ping não funciona (100% packet loss)**
 
 ```bash
-# Verificar o status
-systemctl status the-lions-connect
-
-# Ver os logs detalhados
-journalctl -u the-lions-connect -n 50 --no-pager
+ping 10.99.0.1
+# PING 10.99.0.1 (10.99.0.1) 56(84) bytes of data.
+# --- 10.99.0.1 ping statistics ---
+# 5 packets transmitted, 0 received, 100% packet loss
 ```
 
-#### **Causa Comum 1: Chave SSH não autorizada**
+**Diagnóstico:**
 
-Se os logs mostrarem um erro de `Permission denied (publickey)`, isso significa que a chave pública do seu servidor não foi adicionada corretamente ao Servidor Central.
+1. **Verificar se WireGuard está rodando:**
+   ```bash
+   sudo systemctl status wg-quick@the-lions
+   ```
 
-- **Solução**: Contate o administrador da rede, confirme que ele recebeu a chave pública correta (do arquivo `/root/.ssh/id_manus.pub`) e peça para ele adicioná-la à lista de chaves autorizadas no servidor `thelions.redirectme.net`.
+2. **Verificar se há handshake:**
+   ```bash
+   sudo wg show
+   # Deve mostrar "latest handshake: X seconds ago"
+   ```
 
-#### **Causa Comum 2: Problema de rede ou firewall**
+3. **Verificar endpoint configurado:**
+   ```bash
+   sudo cat /etc/wireguard/the-lions.conf | grep Endpoint
+   ```
 
-Se os logs mostrarem um erro de `Connection timed out` ou `Network is unreachable`, o seu servidor não está conseguindo se comunicar com o Servidor Central.
+**Soluções:**
 
-- **Solução**:
-  1.  **Teste a conectividade**: Tente pingar e se conectar manualmente ao servidor central. Substitua `2220` pela porta correta, se for diferente.
-      ```bash
-      ping thelions.redirectme.net
-      nc -zv thelions.redirectme.net 2220
-      ```
-  2.  **Verifique o Firewall**: Certifique-se de que o firewall do seu servidor ou da sua rede permite tráfego de **saída** (outbound) para o endereço `thelions.redirectme.net` na porta TCP `2220`.
+#### **Solução 1: Endpoint Incorreto**
 
-#### **Causa Comum 3: Arquivos de configuração corrompidos**
+Se você está na **mesma rede local** (172.31.1.x) que o servidor:
+```bash
+sudo sed -i 's/Endpoint = .*/Endpoint = 172.31.1.1:13231/' /etc/wireguard/the-lions.conf
+sudo systemctl restart wg-quick@the-lions
+```
 
-Se os logs mostrarem erros relacionados a arquivos não encontrados ou com formato inválido dentro de `/opt/the-lions-connect`.
+Se você está em **rede externa**:
+```bash
+sudo sed -i 's/Endpoint = .*/Endpoint = 190.15.98.231:13231/' /etc/wireguard/the-lions.conf
+sudo systemctl restart wg-quick@the-lions
+```
 
-- **Solução**: A maneira mais fácil de corrigir isso é reinstalar o The Lions Connect. Primeiro, execute o script de desinstalação e, em seguida, execute o comando de instalação novamente.
-  ```bash
-  /opt/the-lions-connect/uninstall.sh
-  curl -fsSL https://connect.thelions.net/install | bash
-  ```
-  > **Lembre-se**: A reinstalação gerará um novo ID e uma nova chave SSH. Você precisará enviar as novas informações ao administrador novamente.
+#### **Solução 2: Reiniciar WireGuard**
 
----
+```bash
+sudo systemctl restart wg-quick@the-lions
+sleep 3
+sudo wg show
+ping -c 5 10.99.0.1
+```
 
-### **Problema 2: O serviço está `active (running)`, mas o acesso remoto não funciona.**
+#### **Solução 3: Verificar Firewall do Cliente**
 
-Isso geralmente indica que o túnel foi estabelecido, mas há um problema no lado do administrador ou no encaminhamento da porta.
+```bash
+# Ubuntu/Debian
+sudo ufw status
+sudo ufw allow out 13231/udp
 
-#### **Causa Comum 1: Porta incorreta**
-
-O administrador pode estar tentando se conectar à porta errada.
-
-- **Solução**: Verifique o ID do seu dispositivo (no arquivo `/opt/the-lions-connect/config.json`) e peça ao administrador para confirmar qual porta dinâmica foi calculada para esse ID.
-
-#### **Causa Comum 2: Firewall no Servidor Central**
-
-Pode haver uma regra de firewall no Servidor Central (MikroTik) que está bloqueando o acesso à porta dinâmica do seu túnel.
-
-- **Solução**: Peça ao administrador para verificar as regras de firewall no MikroTik e garantir que não há uma regra de `drop` que impeça o acesso à sua porta específica.
-
----
-
-### **Problema 3: A conexão cai frequentemente.**
-
-O serviço foi projetado para se reconectar, mas quedas frequentes podem indicar um problema de instabilidade na rede.
-
-- **Diagnóstico**: Use ferramentas como `mtr` ou `ping` contínuo para verificar a estabilidade da sua conexão com o servidor `thelions.redirectme.net`.
-  ```bash
-  mtr thelions.redirectme.net
-  ```
-- **Solução**: Se for detectada perda de pacotes ou alta latência, o problema provavelmente está na sua rede local ou no seu provedor de internet. Contate o suporte da sua rede.
+# CentOS/RHEL
+sudo firewall-cmd --list-all
+sudo firewall-cmd --add-port=13231/udp --permanent
+sudo firewall-cmd --reload
+```
 
 ---
 
-### **Coletando Informações para Suporte**
+## 🤝 **Problemas de Handshake**
 
-Se você não conseguir resolver o problema, colete as seguintes informações antes de pedir ajuda ao administrador:
+### **Sintoma: RX=0, TX=0 ou "latest handshake: never"**
 
-1.  A saída do comando `systemctl status the-lions-connect`.
-2.  As últimas 50 linhas dos logs: `journalctl -u the-lions-connect -n 50 --no-pager`.
-3.  O conteúdo do arquivo de configuração: `cat /opt/the-lions-connect/config.json`.
-4.  O resultado do teste de conectividade: `nc -zv thelions.redirectme.net 2220`.
+```bash
+sudo wg show
+# transfer: 0 B received, 148 B sent
+# latest handshake: never
+```
 
-Fornecer essas informações ajudará a diagnosticar o problema muito mais rapidamente.
+**Causa:** O handshake WireGuard não está acontecendo.
+
+**Diagnóstico:**
+
+1. **Verificar se porta UDP 13231 está acessível:**
+   ```bash
+   nc -vzu 190.15.98.231 13231
+   # Connection to 190.15.98.231 13231 port [udp/*] succeeded!
+   ```
+
+2. **Verificar chave pública do servidor:**
+   ```bash
+   sudo cat /etc/wireguard/the-lions.conf | grep PublicKey
+   # Deve ser: 2DN8lgjtjUaR+xQ4pmKySGZoii0QdYOJ8Pa5QaS4iBU=
+   ```
+
+**Soluções:**
+
+#### **Solução 1: Chave Pública Incorreta**
+
+```bash
+sudo sed -i 's/PublicKey = .*/PublicKey = 2DN8lgjtjUaR+xQ4pmKySGZoii0QdYOJ8Pa5QaS4iBU=/' /etc/wireguard/the-lions.conf
+sudo systemctl restart wg-quick@the-lions
+```
+
+#### **Solução 2: Firewall do MikroTik Bloqueando**
+
+Verificar no MikroTik se há regra para aceitar UDP 13231:
+
+```routeros
+/ip/firewall/filter/print where dst-port=13231
+```
+
+Se não houver, adicionar:
+
+```routeros
+/ip/firewall/filter add chain=input protocol=udp dst-port=13231 action=accept comment="TLC - WireGuard Port"
+```
+
+#### **Solução 3: Peer Não Aprovado**
+
+Verificar se o peer existe no MikroTik:
+
+```routeros
+/interface/wireguard/peers/print
+```
+
+Se não existir, aprovar o cliente (ver README.md).
+
+---
+
+## 🔥 **Problemas de Firewall**
+
+### **Sintoma: Handshake OK mas ping não funciona**
+
+```bash
+sudo wg show
+# latest handshake: 10 seconds ago
+# transfer: 0 B received, 296 B sent
+
+ping 10.99.0.1
+# 100% packet loss
+```
+
+**Causa:** Firewall do MikroTik bloqueando tráfego FORWARD ou INPUT.
+
+**Diagnóstico:**
+
+No MikroTik, verificar regras de firewall:
+
+```routeros
+/ip/firewall/filter/print where comment~"TLC"
+```
+
+**Soluções:**
+
+#### **Solução 1: Adicionar Regras de Firewall**
+
+Execute no MikroTik:
+
+```routeros
+# INPUT
+/ip/firewall/filter add chain=input in-interface=the-lions-wg action=accept comment="TLC - Input from WireGuard" place-before=[find chain=input comment~"DROP"]
+
+# FORWARD
+/ip/firewall/filter add chain=forward in-interface=the-lions-wg action=accept comment="TLC - Forward from WireGuard" place-before=[find chain=forward comment~"DROP"]
+
+/ip/firewall/filter add chain=forward out-interface=the-lions-wg action=accept comment="TLC - Forward to WireGuard" place-before=[find chain=forward comment~"DROP"]
+
+# Exceção para bogons
+/ip/firewall/filter add chain=forward src-address=10.99.0.0/24 action=accept comment="TLC - Allow WireGuard Network" place-before=[find chain=forward comment~"bogon"]
+
+/ip/firewall/filter add chain=forward dst-address=10.99.0.0/24 action=accept comment="TLC - Allow to WireGuard Network" place-before=[find chain=forward comment~"bogon"]
+
+# OUTPUT
+/ip/firewall/filter add chain=output out-interface=the-lions-wg action=accept comment="TLC - Output to WireGuard"
+```
+
+#### **Solução 2: Mover Regras para Posição Correta**
+
+As regras TLC devem estar **ANTES** das regras de DROP!
+
+```routeros
+# Listar regras com números
+/ip/firewall/filter print
+
+# Mover regra (exemplo: mover regra 50 para antes da 10)
+/ip/firewall/filter move 50 10
+```
+
+---
+
+## 🌐 **Problemas de DNS**
+
+### **Sintoma: "Temporary failure in name resolution"**
+
+```bash
+ping thelions.redirectme.net
+# ping: thelions.redirectme.net: Temporary failure in name resolution
+```
+
+**Causa:** DNS não está resolvendo o domínio.
+
+**Solução:**
+
+O script v2.0 já usa IP direto automaticamente. Se ainda tiver problema:
+
+```bash
+sudo sed -i 's/Endpoint = thelions.redirectme.net:13231/Endpoint = 190.15.98.231:13231/' /etc/wireguard/the-lions.conf
+sudo systemctl restart wg-quick@the-lions
+```
+
+---
+
+## 📦 **Problemas de Instalação**
+
+### **Sintoma: "WireGuard not found" após instalação**
+
+**Solução:**
+
+```bash
+# Ubuntu/Debian
+sudo apt-get update
+sudo apt-get install -y wireguard wireguard-tools
+
+# CentOS/RHEL
+sudo yum install -y wireguard-tools
+
+# Verificar
+wg --version
+```
+
+### **Sintoma: "Permission denied" ao executar script**
+
+**Solução:**
+
+```bash
+# Executar com sudo
+curl -fsSL https://raw.githubusercontent.com/Thelionsinformatica/the-lions-connect/main/install-v2.sh | sudo bash
+```
+
+---
+
+## 🔍 **Diagnóstico Geral**
+
+### **Checklist Completo**
+
+Execute os seguintes comandos para diagnóstico completo:
+
+```bash
+echo "=== SISTEMA ==="
+uname -a
+cat /etc/os-release | grep PRETTY_NAME
+
+echo -e "\n=== WIREGUARD ==="
+wg --version
+sudo systemctl status wg-quick@the-lions
+
+echo -e "\n=== CONFIGURAÇÃO ==="
+sudo cat /etc/wireguard/the-lions.conf
+
+echo -e "\n=== STATUS WIREGUARD ==="
+sudo wg show
+
+echo -e "\n=== CONECTIVIDADE ==="
+ping -c 3 8.8.8.8
+nc -vzu 190.15.98.231 13231
+
+echo -e "\n=== ROTAS ==="
+ip route | grep 10.99
+
+echo -e "\n=== LOGS ==="
+sudo journalctl -u wg-quick@the-lions -n 20 --no-pager
+```
+
+### **Enviar Diagnóstico para Suporte**
+
+```bash
+# Salvar diagnóstico em arquivo
+bash diagnostico.sh > /tmp/diagnostico-wireguard.txt 2>&1
+
+# Enviar para suporte
+cat /tmp/diagnostico-wireguard.txt
+```
+
+---
+
+## 📞 **Suporte**
+
+Se nenhuma solução acima resolver:
+
+1. Execute o diagnóstico completo
+2. Abra uma issue no GitHub: https://github.com/Thelionsinformatica/the-lions-connect/issues
+3. Ou entre em contato: suporte@thelions.com.br
+
+---
+
+**Desenvolvido com 🦁 por The Lions Informática**
